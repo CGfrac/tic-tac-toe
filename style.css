@@ -1,0 +1,30 @@
+:root {
+    --board-side-length: 600px;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: sans-serif;
+}
+
+#board {
+    height: var(--board-side-length);
+    width: var(--board-side-length);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+}
+
+.cell {
+    border: 1px solid #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cell > span {
+    font-size: 10rem;
+}
