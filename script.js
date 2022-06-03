@@ -104,6 +104,7 @@ const game = (() => {
     const _players = [];
     let _currentPlayer = 0;
     let _turn = 0;
+    let _gameOver = false;
 
     const _getCurrentPlayer = () => {
         return _players[_currentPlayer];
@@ -114,6 +115,10 @@ const game = (() => {
     };
 
     const _playTurn = (event) => {
+        if (_gameOver) {
+            return;
+        }
+
         _turn++;
 
         const boardIndex = parseInt(event.target.getAttribute('data-index'));
@@ -128,8 +133,10 @@ const game = (() => {
 
             if (_turn > 4 && gameBoard.win(token)) {
                 console.log('win');
+                _gameOver = true;
             } else if (_turn == 9) {
                 console.log('tie');
+                _gameOver = true;
             }
 
             _changeCurrentPlayer();
