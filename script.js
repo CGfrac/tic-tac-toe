@@ -15,33 +15,7 @@ const gameBoard = (() => {
 
     const clearBoard = () => _board = Array(9).fill('');
 
-    const _winningRow = token => {
-        row:
-        for (let i = 0; i <= 6; i += 3) {
-            for (let j = i; j < i+3; j++) {
-                if (getTile(j) !== token) {
-                    continue row;
-                }
-            }
-            return true;
-        }
-        return false;
-    };
-
-    const _winningColumn = token => {
-        column:
-        for (let i = 0; i < 3; i++) {
-            for (let j = i; j <= i+6; j += 3) {
-                if (getTile(j) !== token) {
-                    continue column;
-                }
-            }
-            return true;
-        }
-        return false;
-    };
-
-    const _checkDiagonal = (token, start, end, step) => {
+    const _threeInARow = (token, start, end, step) => {
         for (let i = start; i <= end; i += step) {
             if (getTile(i) !== token) {
                 return false;
@@ -50,8 +24,26 @@ const gameBoard = (() => {
         return true;
     };
 
+    const _winningRow = token => {
+        for (let i = 0; i <= 6; i += 3) {
+            if (_threeInARow(token, i, i+2, 1)) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    const _winningColumn = token => {
+        for (let i = 0; i <= 2; i++) {
+            if (_threeInARow(token, i, i+6, 3)) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     const _winningDiagonal = token => {
-        return _checkDiagonal(token, 0, 8, 4) || _checkDiagonal(token, 2, 6, 2);
+        return _threeInARow(token, 0, 8, 4) || _threeInARow(token, 2, 6, 2);
     };
 
     const win = token => {
