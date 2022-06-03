@@ -76,7 +76,7 @@ const game = (() => {
         _currentPlayer = (_currentPlayer + 1) % 2;
     };
 
-    const _handleClick = (event) => {
+    const _playTurn = (event) => {
         const boardIndex = parseInt(event.target.getAttribute('data-index'));
         const tile = gameBoard.getTile(boardIndex);
 
@@ -94,7 +94,7 @@ const game = (() => {
     const _setEventListeners = () => {
         const tiles = document.querySelectorAll('.tile');
 
-        tiles.forEach(tile => tile.addEventListener('click', _handleClick));
+        tiles.forEach(tile => tile.addEventListener('click', _playTurn));
     };
 
     const newGame = () => {
