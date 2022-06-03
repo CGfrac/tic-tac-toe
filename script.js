@@ -103,6 +103,7 @@ const player = token => {
 const game = (() => {
     const _players = [];
     let _currentPlayer = 0;
+    let _turn = 0;
 
     const _getCurrentPlayer = () => {
         return _players[_currentPlayer];
@@ -113,6 +114,8 @@ const game = (() => {
     };
 
     const _playTurn = (event) => {
+        _turn++;
+
         const boardIndex = parseInt(event.target.getAttribute('data-index'));
         const tile = gameBoard.getTile(boardIndex);
 
@@ -123,8 +126,10 @@ const game = (() => {
             gameBoard.setTile(boardIndex, token);
             displayController.updateTile(boardIndex, token);
 
-            if (gameBoard.win(token)) {
+            if (_turn > 4 && gameBoard.win(token)) {
                 console.log('win');
+            } else if (_turn == 9) {
+                console.log('tie');
             }
 
             _changeCurrentPlayer();
