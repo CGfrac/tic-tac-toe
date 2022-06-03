@@ -1,5 +1,6 @@
 :root {
     --board-side-length: 600px;
+    --cell-side-length: calc(var(--board-side-length) / 3);
 }
 
 body {
@@ -14,8 +15,8 @@ body {
     height: var(--board-side-length);
     width: var(--board-side-length);
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(3, var(--cell-side-length));
+    grid-template-rows: repeat(3, var(--cell-side-length));
 }
 
 .cell {
