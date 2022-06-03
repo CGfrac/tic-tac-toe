@@ -5,11 +5,11 @@ const gameBoard = (() => {
         return _board;
     };
 
-    const getCell = index => {
+    const getTile = index => {
         return _board[index]
     };
 
-    const setCell = (index, token) => {
+    const setTile = (index, token) => {
         _board[index] = token;
     };
 
@@ -17,8 +17,8 @@ const gameBoard = (() => {
 
     return {
         getBoard,
-        getCell,
-        setCell,
+        getTile,
+        setTile,
         clearBoard
     };
 })();
@@ -29,28 +29,28 @@ const displayController = (() => {
         const boardContainer = document.querySelector('#board');
 
         for (let i = 0; i < boardArray.length; i++) {
-            const cell = document.createElement('div');
-            cell.classList.add('cell');
-            cell.setAttribute('data-index', i);
+            const tile = document.createElement('div');
+            tile.classList.add('tile');
+            tile.setAttribute('data-index', i);
 
-            const cellContent = document.createElement('span');
-            cellContent.textContent = boardArray[i];
+            const tileContent = document.createElement('span');
+            tileContent.textContent = boardArray[i];
 
-            cell.appendChild(cellContent);
-            boardContainer.appendChild(cell);
+            tile.appendChild(tileContent);
+            boardContainer.appendChild(tile);
         }
     }
 
-    const updateCell = (index, token) => {
-        const cell = document.querySelector(`[data-index="${index}"]`);
-        const cellContent = cell.children[0];
+    const updateTile = (index, token) => {
+        const tile = document.querySelector(`[data-index="${index}"]`);
+        const tileContent = tile.children[0];
 
-        cellContent.textContent = token;
+        tileContent.textContent = token;
     };
 
     return {
         drawboard,
-        updateCell
+        updateTile
     };
 })();
 
@@ -78,23 +78,23 @@ const game = (() => {
 
     const _handleClick = (event) => {
         const boardIndex = parseInt(event.target.getAttribute('data-index'));
-        const cell = gameBoard.getCell(boardIndex);
+        const tile = gameBoard.getTile(boardIndex);
 
-        if (cell === '') {
+        if (tile === '') {
             const player = _getCurrentPlayer();
             const token = player.getToken();
 
-            gameBoard.setCell(boardIndex, token);
-            displayController.updateCell(boardIndex, token);
+            gameBoard.setTile(boardIndex, token);
+            displayController.updateTile(boardIndex, token);
 
             _changeCurrentPlayer();
         }
     };
 
     const _setEventListeners = () => {
-        const cells = document.querySelectorAll('.cell');
+        const tiles = document.querySelectorAll('.tile');
 
-        cells.forEach(cell => cell.addEventListener('click', _handleClick));
+        tiles.forEach(tile => tile.addEventListener('click', _handleClick));
     };
 
     const newGame = () => {

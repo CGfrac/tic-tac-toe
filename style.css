@@ -19,13 +19,13 @@ body {
     grid-template-rows: repeat(3, var(--cell-side-length));
 }
 
-.cell {
+.tile {
     border: 1px solid #000;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.cell > span {
+.tile > span {
     font-size: 10rem;
 }
