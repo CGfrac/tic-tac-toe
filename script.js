@@ -84,18 +84,33 @@ const displayController = (() => {
         tileContent.textContent = token;
     };
 
+    const showForm = () => {
+        const registerForm = document.querySelector('#register');
+        registerForm.style.display = 'block';
+    };
+
+    const hideForm = () => {
+        const registerForm = document.querySelector('#register');
+        registerForm.style.display = 'none';
+    };
+
     return {
         drawboard,
-        updateTile
+        updateTile,
+        showForm,
+        hideForm
     };
 })();
 
-const player = token => {
+const player = (name, token) => {
+    const _name = name;
     const _token = token;
 
+    const getName = () => { return _name };
     const getToken = () => { return _token };
 
     return {
+        getName,
         getToken
     };
 };
@@ -112,6 +127,10 @@ const game = (() => {
 
     const _changeCurrentPlayer = () => {
         _currentPlayer = (_currentPlayer + 1) % 2;
+    };
+
+    const _declareWinner = player => {
+        console.log(player.getName());
     };
 
     const _playTurn = (event) => {
@@ -132,7 +151,7 @@ const game = (() => {
             displayController.updateTile(boardIndex, token);
 
             if (_turn > 4 && gameBoard.win(token)) {
-                console.log('win');
+                _declareWinner(player);
                 _gameOver = true;
             } else if (_turn == 9) {
                 console.log('tie');
@@ -149,13 +168,20 @@ const game = (() => {
         tiles.forEach(tile => tile.addEventListener('click', _playTurn));
     };
 
-    const newGame = () => {
-        displayController.drawboard();
+    const _registerPlayers = () => {
+        const formData = new FormData(form);
 
-        const player1 = player('X');
-        const player2 = player('0');
+        const player1 = player(formData.get('player1'), 'X');
+        const player2 = player(formData.get('player2'), 'O');
+
         _players.push(player1, player2);
+    };
 
+    const newGame = (event) => {
+        event.preventDefault();
+        displayController.hideForm();
+
+        _registerPlayers();
         _setEventListeners();
     };
 
@@ -164,4 +190,10 @@ const game = (() => {
     };
 })();
 
-game.newGame();
+displayController.drawboard();
+
+const start = document.querySelector('#start');
+start.addEventListener('click', displayController.showForm);
+
+const form = document.querySelector('form');
+form.addEventListener('submit', game.newGame);
