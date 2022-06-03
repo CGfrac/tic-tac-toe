@@ -35,10 +35,12 @@ const displayController = (() => {
 
 const player = token => {
     const _token = token;
-    let _score = 0;
 
     const getToken = () => { return _token };
-    const getScore = () => { return _score };
+
+    return {
+        getToken
+    };
 };
 
 const game = (() => {
