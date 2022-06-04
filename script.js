@@ -13,7 +13,7 @@ const gameBoard = (() => {
         _board[index] = token;
     };
 
-    const clearBoard = () => _board = Array(9).fill('');
+    const newBoard = () => _board = Array(9).fill('');
 
     const _threeInARow = (token, start, end, step) => {
         for (let i = start; i <= end; i += step) {
@@ -54,7 +54,7 @@ const gameBoard = (() => {
         getBoard,
         getTile,
         setTile,
-        clearBoard,
+        newBoard,
         win
     };
 })();
@@ -79,9 +79,15 @@ const displayController = (() => {
 
     const updateTile = (index, token) => {
         const tile = document.querySelector(`[data-index="${index}"]`);
-        const tileContent = tile.children[0];
+        const tileContent = tile.firstElementChild;
 
         tileContent.textContent = token;
+    };
+
+    const clearTiles = () => {
+        for (let i = 0; i < gameBoard.getBoard().length; i++) {
+            updateTile(i, '');
+        }
     };
 
     const showForm = () => {
@@ -94,11 +100,31 @@ const displayController = (() => {
         registerForm.style.display = 'none';
     };
 
+    const gameOverMessage = (message) => {
+        const para = document.querySelector('#game-over-message');
+        para.textContent = message;
+
+        _showGameOver();
+    };
+
+    const _showGameOver = () => {
+        gameOver.style.display = 'block';
+        start.style.zIndex = 1;
+    };
+
+    const hideGameOver = () => {
+        gameOver.style.display = 'none';
+        start.style.zIndex = 0;
+    };
+
     return {
         drawboard,
         updateTile,
+        clearTiles,
         showForm,
-        hideForm
+        hideForm,
+        gameOverMessage,
+        hideGameOver
     };
 })();
 
@@ -117,9 +143,9 @@ const player = (name, token) => {
 
 const game = (() => {
     const _players = [];
-    let _currentPlayer = 0;
-    let _turn = 0;
-    let _gameOver = false;
+    let _currentPlayer;
+    let _turn;
+    let _gameOver;
 
     const _getCurrentPlayer = () => {
         return _players[_currentPlayer];
@@ -127,10 +153,6 @@ const game = (() => {
 
     const _changeCurrentPlayer = () => {
         _currentPlayer = (_currentPlayer + 1) % 2;
-    };
-
-    const _declareWinner = player => {
-        console.log(player.getName());
     };
 
     const _playTurn = (event) => {
@@ -151,10 +173,10 @@ const game = (() => {
             displayController.updateTile(boardIndex, token);
 
             if (_turn > 4 && gameBoard.win(token)) {
-                _declareWinner(player);
+                displayController.gameOverMessage(`${player.getName()} has won the game!`);
                 _gameOver = true;
             } else if (_turn == 9) {
-                console.log('tie');
+                displayController.gameOverMessage("It's a tie!");
                 _gameOver = true;
             }
 
@@ -177,9 +199,23 @@ const game = (() => {
         _players.push(player1, player2);
     };
 
+    const _clearPlayers = () => {
+        while (_players.length) {
+            _players.pop();
+        }
+    };
+
     const newGame = (event) => {
         event.preventDefault();
         displayController.hideForm();
+
+        gameBoard.newBoard();
+        displayController.clearTiles();
+
+        _clearPlayers();
+        _currentPlayer = 0;
+        _turn = 0;
+        _gameOver = false;
 
         _registerPlayers();
         _setEventListeners();
@@ -192,8 +228,16 @@ const game = (() => {
 
 displayController.drawboard();
 
+function setup(e) {
+    displayController.hideGameOver();
+    displayController.showForm(e)
+    start.textContent = 'Restart';
+}
+
 const start = document.querySelector('#start');
-start.addEventListener('click', displayController.showForm);
+start.addEventListener('click', setup);
 
 const form = document.querySelector('form');
 form.addEventListener('submit', game.newGame);
+
+const gameOver = document.querySelector('#game-over');
