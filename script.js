@@ -178,6 +178,7 @@ const game = (() => {
     let _currentPlayer;
     let _turn;
     let _gameOver;
+    let _cpu;
 
     const _getCurrentPlayer = () => {
         return _players[_currentPlayer];
@@ -213,6 +214,12 @@ const game = (() => {
             }
 
             _changeCurrentPlayer();
+
+            if (_cpu) {
+                // play turn for CPU
+                console.log('cpu');
+                _changeCurrentPlayer();
+            }
         }
     };
 
@@ -248,10 +255,13 @@ const game = (() => {
         _registerPlayer(player1, 'X');
 
         if (formData.get('player2') !== '') {
+            _cpu = false;
             const player2 = formData.get('player2');
-            _registerPlayer(player2, '0');
+            _registerPlayer(player2, 'O');
         } else {
-
+            _cpu = true;
+            // instantiate CPU
+            _registerPlayer('CPU', 'O');
         }
 
         _currentPlayer = 0;
