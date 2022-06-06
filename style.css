@@ -52,8 +52,7 @@ body {
     background-color: rgba(0, 0, 0, 0.4);
 }
 
-.modal > form,
-#game-over > div {
+.modal > * {
     background-color: #fff;
     border: 1px solid #000;
     padding: 16px;
@@ -77,7 +76,8 @@ form > div {
 }
 
 input,
-form button {
+form button,
+.players-number {
     font-size: 1.5rem;
     padding: 8px 16px;
 }
@@ -85,4 +85,10 @@ form button {
 #game-over-message {
     text-align: center;
     font-size: 2rem;
+}
+
+#select-players > div {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
 }

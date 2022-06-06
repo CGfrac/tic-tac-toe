@@ -90,6 +90,35 @@ const displayController = (() => {
         }
     };
 
+    const showSelectPlayers = () => {
+        const selectMenu = document.querySelector('#select-players');
+        selectMenu.style.display = 'block';
+    };
+
+    const _hideSelectPlayers = () => {
+        const selectMenu = document.querySelector('#select-players');
+        selectMenu.style.display = 'none';
+    };
+
+    const modifyForm = (event) => {
+        _hideSelectPlayers();
+
+        const onePlayer = event.target.textContent === 'One';
+
+        const legend = document.querySelector('legend');
+        const playerTwoInput = document.querySelector('#player2');
+
+        if (onePlayer) {
+            legend.textContent = 'Enter your name, champion!';
+            playerTwoInput.removeAttribute('required');
+            playerTwoInput.parentElement.style.display = 'none';
+        } else {
+            legend.textContent = 'Enter your names, champions!'
+            playerTwoInput.setAttribute('required', '');
+            playerTwoInput.parentElement.style.display = 'flex';
+        }
+    };
+
     const showForm = () => {
         const registerForm = document.querySelector('#register');
         registerForm.style.display = 'block';
@@ -121,6 +150,8 @@ const displayController = (() => {
         drawboard,
         updateTile,
         clearTiles,
+        showSelectPlayers,
+        modifyForm,
         showForm,
         hideForm,
         gameOverMessage,
@@ -228,14 +259,22 @@ const game = (() => {
 
 displayController.drawboard();
 
-function setup(e) {
+function setup() {
     displayController.hideGameOver();
-    displayController.showForm(e)
+    displayController.showSelectPlayers();
     start.textContent = 'Restart';
+}
+
+function setPlayers(e) {
+    displayController.modifyForm(e);
+    displayController.showForm();
 }
 
 const start = document.querySelector('#start');
 start.addEventListener('click', setup);
+
+const playerSelectButtons = document.querySelectorAll('.players-number');
+playerSelectButtons.forEach(button => button.addEventListener('click', setPlayers));
 
 const form = document.querySelector('form');
 form.addEventListener('submit', game.newGame);
