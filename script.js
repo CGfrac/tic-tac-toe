@@ -221,13 +221,13 @@ const game = (() => {
         tiles.forEach(tile => tile.addEventListener('click', _playTurn));
     };
 
-    const _registerPlayers = () => {
-        const formData = new FormData(form);
+    const _getFormData = () => {
+        return new FormData(form);
+    }
 
-        const player1 = player(formData.get('player1'), 'X');
-        const player2 = player(formData.get('player2'), 'O');
-
-        _players.push(player1, player2);
+    const _registerPlayer = (playerName, token) => {
+        const newPlayer = player(playerName, token);
+        _players.push(newPlayer);
     };
 
     const _clearPlayers = () => {
@@ -239,16 +239,26 @@ const game = (() => {
     const newGame = (event) => {
         event.preventDefault();
         displayController.hideForm();
-
-        gameBoard.newBoard();
-        displayController.clearTiles();
+        const formData = _getFormData();
 
         _clearPlayers();
+
+        const player1 = formData.get('player1');
+        _registerPlayer(player1, 'X');
+
+        if (formData.has('player2')) {
+            const player2 = formData.get('player2');
+            _registerPlayer(player2, '0');
+        } else {
+
+        }
+
         _currentPlayer = 0;
         _turn = 0;
         _gameOver = false;
 
-        _registerPlayers();
+        gameBoard.newBoard();
+        displayController.clearTiles();
         _setEventListeners();
     };
 
