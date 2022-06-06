@@ -173,6 +173,33 @@ const player = (name, token) => {
     };
 };
 
+const computerPlayer = () => {
+    const _name = 'CPU';
+    const _token = 'O';
+
+    const {getName, getToken} = player(_name, _token);
+
+    const _getRandomIndex = () => {
+        return Math.floor(Math.random() * 9);
+    };
+
+    const pickMove = () => {
+        while (true) {
+            const index = _getRandomIndex();
+            const tile = gameBoard.getTile(index);
+            if (tile === '') {
+                return index;
+            }
+        }
+    };
+
+    return {
+        getName,
+        getToken,
+        pickMove
+    };
+};
+
 const game = (() => {
     const _players = [];
     let _currentPlayer;
@@ -188,6 +215,35 @@ const game = (() => {
         _currentPlayer = (_currentPlayer + 1) % 2;
     };
 
+    const _executeMove = (index) => {
+        const token = _getCurrentPlayer().getToken();
+        gameBoard.setTile(index, token);
+        displayController.updateTile(index, token);
+    }
+
+    const _checkGameOver = () => {
+        const player = _getCurrentPlayer();
+        const token = player.getToken();
+
+        if (_turn > 4 && gameBoard.win(token)) {
+            displayController.gameOverMessage(`${player.getName()} has won the game!`);
+            _gameOver = true;
+        } else if (_turn == 9) {
+            displayController.gameOverMessage("It's a tie!");
+            _gameOver = true;
+        }
+    }
+
+    const _playComputerTurn = () => {
+        _turn++;
+
+        const computer = _getCurrentPlayer();
+
+        _executeMove(computer.pickMove());
+        _checkGameOver();
+        _changeCurrentPlayer();
+    };
+
     const _playTurn = (event) => {
         if (_gameOver) {
             return;
@@ -199,26 +255,12 @@ const game = (() => {
         const tile = gameBoard.getTile(boardIndex);
 
         if (tile === '') {
-            const player = _getCurrentPlayer();
-            const token = player.getToken();
-
-            gameBoard.setTile(boardIndex, token);
-            displayController.updateTile(boardIndex, token);
-
-            if (_turn > 4 && gameBoard.win(token)) {
-                displayController.gameOverMessage(`${player.getName()} has won the game!`);
-                _gameOver = true;
-            } else if (_turn == 9) {
-                displayController.gameOverMessage("It's a tie!");
-                _gameOver = true;
-            }
-
+            _executeMove(boardIndex);
+            _checkGameOver();
             _changeCurrentPlayer();
 
-            if (_cpu) {
-                // play turn for CPU
-                console.log('cpu');
-                _changeCurrentPlayer();
+            if (_cpu && !_gameOver) {
+                _playComputerTurn();
             }
         }
     };
@@ -238,6 +280,11 @@ const game = (() => {
         _players.push(newPlayer);
     };
 
+    const _registerCPU = () => {
+        const playerCPU = computerPlayer();
+        _players.push(playerCPU);
+    };
+
     const _clearPlayers = () => {
         while (_players.length) {
             _players.pop();
@@ -251,17 +298,16 @@ const game = (() => {
 
         _clearPlayers();
 
-        const player1 = formData.get('player1');
-        _registerPlayer(player1, 'X');
+        const playerName = formData.get('player1');
+        _registerPlayer(playerName, 'X');
 
         if (formData.get('player2') !== '') {
             _cpu = false;
-            const player2 = formData.get('player2');
-            _registerPlayer(player2, 'O');
+            const playerTwoName = formData.get('player2');
+            _registerPlayer(playerTwoName, 'O');
         } else {
             _cpu = true;
-            // instantiate CPU
-            _registerPlayer('CPU', 'O');
+            _registerCPU();
         }
 
         _currentPlayer = 0;
