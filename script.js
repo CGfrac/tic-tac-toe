@@ -110,6 +110,7 @@ const displayController = (() => {
 
         if (onePlayer) {
             legend.textContent = 'Enter your name, champion!';
+            playerTwoInput.value = '';
             playerTwoInput.removeAttribute('required');
             playerTwoInput.parentElement.style.display = 'none';
         } else {
@@ -246,7 +247,7 @@ const game = (() => {
         const player1 = formData.get('player1');
         _registerPlayer(player1, 'X');
 
-        if (formData.has('player2')) {
+        if (formData.get('player2') !== '') {
             const player2 = formData.get('player2');
             _registerPlayer(player2, '0');
         } else {
