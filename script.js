@@ -13,7 +13,7 @@ const gameBoard = (() => {
         _board[index] = token;
     };
 
-    const newBoard = () => _board = Array(9).fill('');
+    const newBoard = () => _board.fill('');
 
     const _threeInARow = (token, start, end, step) => {
         for (let i = start; i <= end; i += step) {
