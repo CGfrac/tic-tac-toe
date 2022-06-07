@@ -271,6 +271,11 @@ const game = (() => {
         tiles.forEach(tile => tile.addEventListener('click', _playTurn));
     };
 
+    const setPlayers = event => {
+        displayController.modifyForm(event);
+        displayController.showForm();
+    };
+
     const _getFormData = () => {
         return new FormData(form);
     }
@@ -320,6 +325,7 @@ const game = (() => {
     };
 
     return {
+        setPlayers,
         newGame
     };
 })();
@@ -332,16 +338,11 @@ function setup() {
     start.textContent = 'Restart';
 }
 
-function setPlayers(e) {
-    displayController.modifyForm(e);
-    displayController.showForm();
-}
-
 const start = document.querySelector('#start');
 start.addEventListener('click', setup);
 
 const playerSelectButtons = document.querySelectorAll('.players-number');
-playerSelectButtons.forEach(button => button.addEventListener('click', setPlayers));
+playerSelectButtons.forEach(button => button.addEventListener('click', game.setPlayers));
 
 const form = document.querySelector('form');
 form.addEventListener('submit', game.newGame);
