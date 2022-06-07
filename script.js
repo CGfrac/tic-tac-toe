@@ -207,20 +207,18 @@ const computerPlayer = () => {
         return gameBoard([...boardObject.getBoard(), new Set(boardObject.getAvailableMoves())]);
     };
 
-    const _getScore = (boardState) => {
-        if (boardState.win(_token)) {
-            return 1;
-        }
-        if (boardState.win('X')) {
-            return -1;
-        }
-        return 0;
-    };
-
     // See https://en.wikipedia.org/wiki/Minimax
     const _minimax = (token, turn, boardState) => {
-        if (turn > 4 && (boardState.win(token) || turn === 9)) {
-            return _getScore(boardState);
+        if (turn > 4) {
+            if (boardState.win(_token)) {
+                return 1;
+            }
+            if (boardState.win('X')) {
+                return -1;
+            }
+            if (turn === 9) {
+                return 0;
+            }
         }
 
         const scores = [];
