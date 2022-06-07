@@ -1,16 +1,31 @@
-const gameBoard = (() => {
-    let _board = Array(9).fill('');
+const gameBoard = () => {
+    const _board = Array(9).fill('');
+
+    const _availableMoves = new Set();
+
+    for (let i = 0; i < _board.length; i++) {
+        _availableMoves.add(i);
+    }
 
     const getBoard = () => {
         return _board;
     };
 
+    const getAvailableMoves = () => {
+        return _availableMoves;
+    };
+
+    const _updateAvailableMoves = index => {
+        _availableMoves.delete(index);
+    };
+
     const getTile = index => {
-        return _board[index]
+        return _board[index];
     };
 
     const setTile = (index, token) => {
         _board[index] = token;
+        _updateAvailableMoves(index);
     };
 
     const newBoard = () => _board.fill('');
@@ -52,16 +67,17 @@ const gameBoard = (() => {
 
     return {
         getBoard,
+        getAvailableMoves,
         getTile,
         setTile,
         newBoard,
         win
     };
-})();
+};
 
 const displayController = (() => {
     const drawboard = () => {
-        const boardArray = gameBoard.getBoard();
+        const boardArray = board.getBoard();
         const boardContainer = document.querySelector('#board');
 
         for (let i = 0; i < boardArray.length; i++) {
@@ -85,7 +101,7 @@ const displayController = (() => {
     };
 
     const clearTiles = () => {
-        for (let i = 0; i < gameBoard.getBoard().length; i++) {
+        for (let i = 0; i < board.getBoard().length; i++) {
             updateTile(i, '');
         }
     };
@@ -186,7 +202,7 @@ const computerPlayer = () => {
     const pickMove = () => {
         while (true) {
             const index = _getRandomIndex();
-            const tile = gameBoard.getTile(index);
+            const tile = board.getTile(index);
             if (tile === '') {
                 return index;
             }
@@ -217,7 +233,7 @@ const game = (() => {
 
     const _executeMove = (index) => {
         const token = _getCurrentPlayer().getToken();
-        gameBoard.setTile(index, token);
+        board.setTile(index, token);
         displayController.updateTile(index, token);
     }
 
@@ -225,7 +241,7 @@ const game = (() => {
         const player = _getCurrentPlayer();
         const token = player.getToken();
 
-        if (_turn > 4 && gameBoard.win(token)) {
+        if (_turn > 4 && board.win(token)) {
             displayController.gameOverMessage(`${player.getName()} has won the game!`);
             _gameOver = true;
         } else if (_turn == 9) {
@@ -252,7 +268,7 @@ const game = (() => {
         _turn++;
 
         const boardIndex = parseInt(event.target.getAttribute('data-index'));
-        const tile = gameBoard.getTile(boardIndex);
+        const tile = board.getTile(boardIndex);
 
         if (tile === '') {
             _executeMove(boardIndex);
@@ -319,7 +335,7 @@ const game = (() => {
         _turn = 0;
         _gameOver = false;
 
-        gameBoard.newBoard();
+        board.newBoard();
         displayController.clearTiles();
         _setEventListeners();
     };
@@ -330,6 +346,7 @@ const game = (() => {
     };
 })();
 
+const board = gameBoard();
 displayController.drawboard();
 
 function setup() {
