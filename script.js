@@ -1,11 +1,17 @@
-const gameBoard = () => {
-    const _board = Array(9).fill('');
+const gameBoard = (board = null, availableMoves = null) => {
+    const _board = (board) ? board : Array(9).fill('');
 
-    const _availableMoves = new Set();
+    const _populateSet = () => {
+        const set = new Set();
+        for (let i = 0; i < _board.length; i++) {
+            if (_board[i] === '') {
+                set.add(i);
+            }
+        }
+        return set;
+    };
 
-    for (let i = 0; i < _board.length; i++) {
-        _availableMoves.add(i);
-    }
+    const _availableMoves = (availableMoves) ? availableMoves : _populateSet();
 
     const getBoard = () => {
         return _board;
@@ -192,36 +198,73 @@ const player = (name, token) => {
 const computerPlayer = () => {
     const _name = 'CPU';
     const _token = 'O';
+    let _currentTurn = 0;
+    let _moveChoice;
 
     const {getName, getToken} = player(_name, _token);
 
-    const _getScore = (token, boardState) => {
-        let score = 0;
-        if (boardState.win(token)) {
-            score += 1;
-        }
-        if (token !== _token) {
-            score *= -1;
-        }
-        return score;
+    const _createBoardState = (boardObject) => {
+        return gameBoard([...boardObject.getBoard(), new Set(boardObject.getAvailableMoves())]);
     };
 
-    const _minimax = (token, boardState) => {
-
+    const _getScore = (boardState) => {
+        if (boardState.win(_token)) {
+            return 1;
+        }
+        if (boardState.win('X')) {
+            return -1;
+        }
+        return 0;
     };
 
-    const _getRandomIndex = () => {
-        return Math.floor(Math.random() * 9);
+    // See https://en.wikipedia.org/wiki/Minimax
+    const _minimax = (token, turn, boardState) => {
+        if (boardState.win(token) || turn === 9) {
+            return _getScore(boardState);
+        }
+
+        const scores = [];
+        const moves = [];
+
+        for (const move of boardState.getAvailableMoves()) {
+            const newBoardState = _createBoardState(boardState);
+            newBoardState.setTile(move, token);
+            const newToken = (token === _token) ? 'X' : _token;
+            scores.push(_minimax(newToken, turn + 1, newBoardState));
+            moves.push(move);
+        }
+
+        if (token === _token) {
+            let maxScore = -Infinity;
+            let maxScoreIndex;
+            for (let i = 0; i < scores.length; i++) {
+                if (maxScore < scores[i]) {
+                    maxScore = scores[i];
+                    maxScoreIndex = i;
+                }
+            }
+            _moveChoice = moves[maxScoreIndex];
+            return scores[maxScoreIndex];
+        } else {
+            let minScore = Infinity;
+            let minScoreIndex;
+            for (let i = 0; i < scores.length; i++) {
+                if (minScore > scores[i]) {
+                    minScore = scores[i];
+                    minScoreIndex = i;
+                }
+            }
+            _moveChoice = moves[minScoreIndex];
+            return scores[minScoreIndex];
+        }
     };
 
     const pickMove = () => {
-        while (true) {
-            const index = _getRandomIndex();
-            const tile = board.getTile(index);
-            if (tile === '') {
-                return index;
-            }
-        }
+        _currentTurn++; // player turn accounted
+        const boardState = _createBoardState(board);
+        _minimax(_token, _currentTurn, boardState);
+        _currentTurn++;
+        return _moveChoice;
     };
 
     return {
@@ -237,6 +280,7 @@ const game = (() => {
     let _turn;
     let _gameOver;
     let _cpu;
+    let _computerPlaying = false;
 
     const _getCurrentPlayer = () => {
         return _players[_currentPlayer];
@@ -285,13 +329,15 @@ const game = (() => {
         const boardIndex = parseInt(event.target.getAttribute('data-index'));
         const tile = board.getTile(boardIndex);
 
-        if (tile === '') {
+        if (tile === '' && !_computerPlaying) {
             _executeMove(boardIndex);
             _checkGameOver();
             _changeCurrentPlayer();
 
             if (_cpu && !_gameOver) {
+                _computerPlaying = true;
                 _playComputerTurn();
+                _computerPlaying = false;
             }
         }
     };
