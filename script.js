@@ -219,7 +219,7 @@ const computerPlayer = () => {
 
     // See https://en.wikipedia.org/wiki/Minimax
     const _minimax = (token, turn, boardState) => {
-        if (boardState.win(token) || turn === 9) {
+        if (turn > 4 && (boardState.win(token) || turn === 9)) {
             return _getScore(boardState);
         }
 
