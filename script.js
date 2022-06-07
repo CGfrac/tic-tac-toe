@@ -195,6 +195,21 @@ const computerPlayer = () => {
 
     const {getName, getToken} = player(_name, _token);
 
+    const _getScore = (token, boardState) => {
+        let score = 0;
+        if (boardState.win(token)) {
+            score += 1;
+        }
+        if (token !== _token) {
+            score *= -1;
+        }
+        return score;
+    };
+
+    const _minimax = (token, boardState) => {
+
+    };
+
     const _getRandomIndex = () => {
         return Math.floor(Math.random() * 9);
     };
